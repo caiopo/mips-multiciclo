@@ -19,7 +19,6 @@
 ----------------------------------------------------------------------------------
 library ieee;
 use ieee.std_logic_1164.all;
-use ieee.numeric_std.all;
 
 entity memoria is 
 	port(
@@ -29,7 +28,7 @@ entity memoria is
 		Address: in std_logic_vector(31 downto 0);
 		DataRd: out std_logic_vector(31 downto 0)
 	);
-end;
+end entity;
 
 architecture mem of memoria is 
 	component bram IS
@@ -42,15 +41,14 @@ architecture mem of memoria is
 	);
 	END component;
 
+	
+signal addr : std_logic_vector(9 downto 0);
+
 begin
 
---	geraBRAMs: for i in 0 to 3 generate
---	BRAM0: bram	PORT map (address(9 DOWNTO 2)&std_logic_vector(to_unsigned(i, 2)), 
---								 clock,DataWrt(((i+1)*8)-1 downto i*8), WrtMem,DataRd(((i+1)*8)-1 downto i*8));
---	end generate;
+addr <= "00"&address(9 downto 2);
 
-
-BRAM0: bram port map ("00"&address(9 downto 2), clock, DataWrt, WrtMem, DataRd);
+BRAM0: bram port map (addr, clock, DataWrt, WrtMem, DataRd);
 
 
 end architecture;
