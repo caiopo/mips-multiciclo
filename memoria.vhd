@@ -31,8 +31,8 @@ entity memoria is
 	);
 end;
 
-architecture bram of memoria is 
-	component ramtest IS
+architecture mem of memoria is 
+	component bram IS
 	PORT(
 		address		: IN STD_LOGIC_VECTOR (9 DOWNTO 0);
 		clock		: IN STD_LOGIC  := '1';
@@ -50,8 +50,7 @@ begin
 --	end generate;
 
 
-BRAM: ramtest port map ("00"&address(9 downto 2), clock, DataWrt, WrtMem, DataRd);
+BRAM0: bram port map ("00"&address(9 downto 2), clock, DataWrt, WrtMem, DataRd);
 
 
-end;
-	
+end architecture;
