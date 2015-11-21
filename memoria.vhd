@@ -17,25 +17,41 @@
 -- Additional Comments: 
 --
 ----------------------------------------------------------------------------------
-library IEEE;
+library ieee;
 use ieee.std_logic_1164.all;
 use ieee.numeric_std.all;
 
 entity memoria is 
-   generic(
-      larguraMemoria: natural := 8;
-      larguraDado: natural := 16;
-      bitsEndereco: natural := 4
-   );
-   port(
-      clock, reset: in std_logic;
-      EscMem: in std_logic;
-      Endereco: in std_logic_vector(2**bitsEndereco-1 downto 0);
-      DadoSerEscrito: in std_logic_vector(larguraDado-1 downto 0);
-      DadoMem: out std_logic_vector(larguraDado-1 downto 0)
-   );
-end entity;
+	port(
+		clock: in std_logic;
+		ReadMem, WrtMem: in std_logic;
+		DataWrt: in std_logic_vector(31 downto 0);
+		Address: in std_logic_vector(31 downto 0);
+		DataRd: out std_logic_vector(31 downto 0)
+	);
+end;
 
-architecture comportamental of memoria is
+architecture bram of memoria is 
+	component ramtest IS
+	PORT(
+		address		: IN STD_LOGIC_VECTOR (9 DOWNTO 0);
+		clock		: IN STD_LOGIC  := '1';
+		data		: IN STD_LOGIC_VECTOR (31 DOWNTO 0);
+		wren		: IN STD_LOGIC ;
+		q		: OUT STD_LOGIC_VECTOR (31 DOWNTO 0)
+	);
+	END component;
+
 begin
-end architecture;
+
+--	geraBRAMs: for i in 0 to 3 generate
+--	BRAM0: bram	PORT map (address(9 DOWNTO 2)&std_logic_vector(to_unsigned(i, 2)), 
+--								 clock,DataWrt(((i+1)*8)-1 downto i*8), WrtMem,DataRd(((i+1)*8)-1 downto i*8));
+--	end generate;
+
+
+BRAM: ramtest port map ("00"&address(9 downto 2), clock, DataWrt, WrtMem, DataRd);
+
+
+end;
+	

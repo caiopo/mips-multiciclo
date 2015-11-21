@@ -51,18 +51,13 @@ end component;
 
 
 component memoria is
-	generic(
-      larguraMemoria: natural := 8;
-      larguraDado: natural := 16;
-      bitsEndereco: natural := 4
-   );
-   port(
-      clock, reset: in std_logic;
-      EscMem: in std_logic;
-      Endereco: in std_logic_vector(2**bitsEndereco-1 downto 0);
-      DadoSerEscrito: in std_logic_vector(larguraDado-1 downto 0);
-      DadoMem: out std_logic_vector(larguraDado-1 downto 0)
-   );
+	port(
+		clock: in std_logic;
+		ReadMem, WrtMem: in std_logic;
+		DataWrt: in std_logic_vector(31 downto 0);
+		Address: in std_logic_vector(31 downto 0);
+		DataRd: out std_logic_vector(31 downto 0)
+	);
 end component;
 
 
@@ -120,7 +115,49 @@ component registrador is
    );
 end component;
 
+component somador is
+	generic(largura: natural := 8);
+   port(
+      entradaA, entradaB: in std_logic_vector(largura-1 downto 0);
+		carryIn: in std_logic;
+      saida: out std_logic_vector(largura-1 downto 0)
+   );
+end component;
+
+signal resetPC, resetInstr, resetRedDadosMemoria : std_logic;
+
+signal entradaPC, saidaRegPC, saidaMem, saidaMuxPC, saidaRegULA, saidaRegInstr: std_logic_vector(31 downto 0);
+
+signal regLido1, regLido2, saidaRegDadosMem, dadoEscReg, dadoEscMem: std_logic_vector(31 downto 0);
+
+signal saidaMuxRegSerEscrito: std_logic_vector(4 downto 0);
+
 begin
+
+regPC: registrador generic map(32) port map(clock, resetPC, '1', entradaPC, saidaRegPC);
+
+muxPC: multiplexador2x1 generic map(32) port map (saidaRegPC, saidaRegULA, IouD, saidaMuxPC);
+
+mem: memoria port map (clock, LerMem, EscMem, dadoEscMem, saidaMuxPC, saidaMem); -- TO-DO
+
+regIntrucao: registrador generic map(32) port map(clock, resetInstr, IREsc, saidaMem, saidaRegInstr);
+
+muxRegSerEscrito: multiplexador2x1 generic map (5) port map(saidaRegInstr(20 downto 16), saidaRegInstr(15 downto 11), RegDst, saidaMuxRegSerEscrito);
+
+bancoReg: bancoRegistradores generic map (32, 5) port map(clock, reset, EscReg, saidaRegInstr(25 downto 21), saidaRegInstr(20 downto 16),
+																				saidaMuxRegSerEscrito, regLido1, regLido2);
+																				
+regDadosMemoria: registrador generic map (32) port map(clock, resetRedDadosMemoria, '1', saidaMem, saidaRegDadosMem);
+
+muxDadoEscReg: multiplexador2x1 generic map(32) port map (saidaRegULA, saidaRegDadosMem, MemParaReg, dadoEscReg);
+
+
+
+--clock, reset: in std_logic;
+--EscReg: in std_logic;
+--RegSerLido1, RegSerLido2, RegSerEscrito: in std_logic_vector(bitsRegSerLido-1 downto 0);
+--DadoEscrita: in std_logic_vector(largura-1 downto 0);      
+--DadoLido1, DadoLido2: out std_logic_vector(largura-1 downto 0);
 
 
 
