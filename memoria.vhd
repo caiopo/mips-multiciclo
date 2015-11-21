@@ -33,7 +33,7 @@ end entity;
 architecture mem of memoria is 
 	component bram IS
 	PORT(
-		address		: IN STD_LOGIC_VECTOR (9 DOWNTO 0);
+		address		: IN STD_LOGIC_VECTOR (7 DOWNTO 0);
 		clock		: IN STD_LOGIC  := '1';
 		data		: IN STD_LOGIC_VECTOR (31 DOWNTO 0);
 		wren		: IN STD_LOGIC ;
@@ -42,13 +42,18 @@ architecture mem of memoria is
 	END component;
 
 	
-signal addr : std_logic_vector(9 downto 0);
+--signal addr : std_logic_vector(9 downto 0);
 
 begin
 
-addr <= "00"&address(9 downto 2);
+--	geraBRAMs: for i in 0 to 3 generate
+--	BRAM0: bram	PORT map (address(9 DOWNTO 2)&std_logic_vector(to_unsigned(i, 2)), 
+--								 clock,DataWrt(((i+1)*8)-1 downto i*8), WrtMem,DataRd(((i+1)*8)-1 downto i*8));
+--	end generate;
 
-BRAM0: bram port map (addr, clock, DataWrt, WrtMem, DataRd);
+--addr <= "00"&address(9 downto 2);
+
+BRAM0: bram port map (address(9 downto 2), clock, DataWrt, WrtMem, DataRd);
 
 
 end architecture;
